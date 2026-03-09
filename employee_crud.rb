@@ -3,6 +3,7 @@ employees = {
  12 => { name: "Riya", salary: 50000 }
 }
 
+def add_emp(employees)
 puts "enter emp id"
 id = gets.to_i
 
@@ -15,11 +16,14 @@ salary = gets.to_i
 employees[id] = { name: name, salary: salary }
 
 puts "employees added:"
-p employees
+end
 
+def display(employees)
 puts "employee details:"
 p employees
+end
 
+def update(employees)
 puts "enter emp id to update salary"
 update_id = gets.to_i
 
@@ -32,14 +36,22 @@ if employees[update_id]
 else
   puts "employee not found"
 end
+end
 
-p employees
 
+def delete(employees)
 puts "enter emp id to delete"
 delete_id = gets.to_i
 
 employees.delete(delete_id)
-
 puts "employee deleted"
 puts "remaining emps"
-p employees
+end
+
+display(employees)
+add_emp(employees)
+display(employees)
+update(employees)
+display(employees)
+delete(employees)
+display(employees)
