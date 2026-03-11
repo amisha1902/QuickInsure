@@ -15,6 +15,9 @@ def create_customer(customers)
   phone = gets.chomp
   if phone.length != 10
     puts "Please enter valid phone number!!!!!"
+  elsif customers.values.any? { |c| c[:phone] == phone }
+    puts "phone already exists"
+    return
   else
     break
   end
