@@ -1,9 +1,9 @@
-require "./bank"
-bank = BankService.new
+require "./service/bank_service"
+bank = BankManagementSystem::BankService.new
 choice = 0
-while choice!=9
+while choice!=1
   puts "--Bank Management System-----"
-  puts "1.Add customer"
+  puts "1.Exit"
   puts "2.Create account"
   puts "3.Deposit"    
   puts "4.Withdraw"
@@ -11,12 +11,12 @@ while choice!=9
   puts "6.Request loan"
   puts "7.View all custommers"
   puts "8.View account for particular customer"
-  puts "9.Exit"
   puts "Enter your choice"
   choice = gets.to_i
   case choice
   when 1
-     bank.create_customer
+     puts "Exit"
+     break
   when 2
     bank.create_account
   when 3
@@ -31,9 +31,6 @@ while choice!=9
     bank.show_customer
   when 8
     bank.show_account
-  when 9
-    puts "Exiting"
-    break
   else
     puts "Invalid choice"
   end
