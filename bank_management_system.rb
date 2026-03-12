@@ -45,24 +45,35 @@ choice = 0;
 #   end
 # end
 def validate_phone(customers)
-  loop do 
     puts "Enter phone no"
     phone = gets.chomp
     if phone.length != 10
-      puts "please enter valid 10 digit pone number"
+      puts "please enter valid 10 digit phone number"
+      return nil
+
     elsif customers.values.any? {|c| c[:phone] == phone}
-      puts "phone laredy exists"
+      puts "phone already exists"
+      return nil
+
     else
       return phone 
-    end
-  end  
+    end 
 end
 
 def create_bank_account(customers, accounts)
   cust_id = customers.length+1
   puts "Enter your name: "
   name = gets.chomp
-  phone = validate_phone(customers)
+  phone = nil
+  3.times do |i|
+   phone = validate_phone(customers)
+   if phone
+    break
+   else
+    puts "enter valid phone, #{2 - i} attempst left"
+   end
+  end
+  exit unless phone  
   customers[cust_id] = {name: name, phone: phone}
   acc_id = accounts.length + 1
   puts "Enter initial balance:"
@@ -110,7 +121,7 @@ def withdraw(accounts, transactions)
     puts "Insufficient Balance"
     return
   end
- accounts[acc_id][:balance] -= amount
+  accounts[acc_id][:balance] -= amount
   transactions << {
     type: "withdraw",
     account_id: acc_id,
@@ -203,12 +214,15 @@ def take_loan(loans, customers, si_lambda)
     print "enter loan Amount: "
     amount = gets.to_f
     raise "loan amount must be positive value" if amount <= 0
+
     print "Interest Rate: "
-    interest = gets.to_i
+    interest = gets.to_f
     raise "Interest must be positive" if interest <= 0
+
     print "Years: "
     years = gets.to_i
     raise "Years must be positive" if years <= 0
+
     si = si_lambda.call(amount, interest, years)
     loans[loan_id] = {
       customer_id: cust_id,
@@ -226,14 +240,52 @@ def take_loan(loans, customers, si_lambda)
   end
 end
 
-while choice!=6
+def customer_without_loan(customers, loans)
+  customers.each do |id, customer|
+    unless loans.values.any? {|loan| loan[:customer_id] == id}
+      puts "Customers who have not taken any loan:"
+      puts "#{customer[:name]}"
+    end   
+  end
+end
+
+def customersWithTodaysTransaction(customers, account, transactions)
+  customers.each do |id, customer|
+    transactions.each do |transaction|
+      acc_id = transaction[:account_id]
+      if (transaction[:type] == "withdraw" || transaction[:type] == "deposit") &&
+         transaction[:time].day == Time.now.day &&
+         account[acc_id][:customer_id] == id
+        puts "#{customer[:name]} - #{transaction[:type]}"
+      end
+    end
+  end
+end
+
+def topThreeCustomerWithMaximumLoan(customers, loans)
+  totalLoan = Hash.new(0)
+  loans.each do |id, loan|
+    cust_id = loan[:customer_id]
+    totalLoan[cust_id]+= loan[:amount]
+  end
+  p totalLoan
+  top_three = totalLoan.sort_by {|cust_id, value| value}.reverse.first(3)
+  top_three.each do |id, value|
+    puts "#{customers[id][:name]} - #{value}"
+  end
+end
+
+while choice!=8
   puts "--Bank Management System-----"
   puts "1.Create account"
   puts "2.Deposit"
   puts "3.Withdraw"
   puts "4.Transfer money"
   puts "5.Take loan"
-  puts "6.Exit"
+  puts "6.Customers without loan"
+  puts "7.Show customers who deposited or withdrawn money today"
+  puts "8.Exit"
+  puts "9. Top 3 customer with max loan"
   puts "Enter your choice"
   choice = gets.to_i
   case choice
@@ -248,6 +300,12 @@ while choice!=6
   when 5
     take_loan(loan, customers, si_cal)
   when 6
+    customer_without_loan(customers, loan)
+  when 7
+    customersWithTodaysTransaction(customers, account, transactions)
+  when 9
+    topThreeCustomerWithMaximumLoan(customers, loan)
+  when 8
     puts "Exiting"
     break
   else
