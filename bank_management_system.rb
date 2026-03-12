@@ -1,3 +1,4 @@
+require 'date'
 customers ={}
 account = {}
 transactions = []
@@ -240,38 +241,71 @@ def take_loan(loans, customers, si_lambda)
   end
 end
 
+# def customer_without_loan(customers, loans)
+#   customers.each do |id, customer|
+#     unless loans.values.any? {|loan| loan[:customer_id] == id}
+#       puts "Customers who have not taken any loan:"
+#       puts "#{customer[:name]}"
+#     end   
+#   end
+# end
+
 def customer_without_loan(customers, loans)
-  customers.each do |id, customer|
-    unless loans.values.any? {|loan| loan[:customer_id] == id}
-      puts "Customers who have not taken any loan:"
-      puts "#{customer[:name]}"
-    end   
+  cust_without_loan = customers.select do |id, customer|
+    loans.values.none? { |loan| loan[:customer_id] == id }
+  end
+  puts "Customeres who have not taken any laon:"
+  cust_without_loan.each do |id, customer|
+    puts customer[:name]
   end
 end
 
-def customersWithTodaysTransaction(customers, account, transactions)
-  customers.each do |id, customer|
-    transactions.each do |transaction|
-      acc_id = transaction[:account_id]
-      if (transaction[:type] == "withdraw" || transaction[:type] == "deposit") &&
-         transaction[:time].day == Time.now.day &&
-         account[acc_id][:customer_id] == id
-        puts "#{customer[:name]} - #{transaction[:type]}"
-      end
-    end
+# def customersWithTodaysTransaction(customers, account, transactions)
+#   customers.each do |id, customer|
+#     transactions.each do |transaction|
+#       acc_id = transaction[:account_id]
+#       if (transaction[:type] == "withdraw" || transaction[:type] == "deposit") &&
+#          transaction[:time].day == Time.now.day &&
+#          account[acc_id][:customer_id] == id
+#         puts "#{customer[:name]} - #{transaction[:type]}"
+#       end
+#     end
+#   end
+# end
+
+def customersWithTodaysTransaction(customers, accounts, transactions)
+  todays_transactions = transactions.select do |transaction|
+    (transaction[:type] == "withdraw" || transaction[:type] == "deposit") &&
+     transaction[:time] == Date.today
+    #  p transaction[:time]
+  end
+  todays_transactions.each do |transaction|
+    acc_id = transaction[:account_id]
+    cust_id = accounts[acc_id][:customer_id]
+    puts "#{customers[cust_id][:name]} - #{transaction[:type]}"
   end
 end
+
+# def topThreeCustomerWithMaximumLoan(customers, loans)
+#   totalLoan = Hash.new(0)
+#   loans.each do |id, loan|
+#     cust_id = loan[:customer_id]
+#     totalLoan[cust_id] += loan[:amount]
+#   end
+#   p totalLoan
+#   top_three = totalLoan.sort_by {|cust_id, value| value}.reverse.first(3)
+#   top_three.each do |id, value|
+#     puts "#{customers[id][:name]} - #{value}"
+#   end
+# end
 
 def topThreeCustomerWithMaximumLoan(customers, loans)
-  totalLoan = Hash.new(0)
-  loans.each do |id, loan|
-    cust_id = loan[:customer_id]
-    totalLoan[cust_id]+= loan[:amount]
-  end
-  p totalLoan
-  top_three = totalLoan.sort_by {|cust_id, value| value}.reverse.first(3)
-  top_three.each do |id, value|
-    puts "#{customers[id][:name]} - #{value}"
+  top_three = loans.group_by { |id, loan| loan[:customer_id] }
+                   .map { |cust_id, loan_list| [cust_id, loan_list.sum { |id, loan| loan[:amount] }]}
+                   .sort_by { |cust_id, total| -total }   
+                   .first(3)
+  top_three.each do |cust_id, total_loan|
+    puts "#{customers[cust_id][:name]} - #{total_loan}"
   end
 end
 
