@@ -4,62 +4,90 @@ transactions = []
 loan ={}
 choice = 0;
 
-def create_customer(customers)
+# def create_customer(customers)
+#   cust_id = customers.length+1
+#   puts "Enter customer name"
+#   cust_name = gets.chomp
+#   phone = 0
+#   loop do
+#    puts "Enter customer phone: "
+#    phone = gets.chomp
+#    if phone.length != 10
+#     puts "Please enter valid phone number!!!!!"
+#    elsif customers.values.any? { |c| c[:phone] == phone }
+#     puts "phone already exists"
+#     return
+#    else
+#     break
+#    end
+#   end
+#   customers[cust_id] = {name: cust_name, phone: phone}
+#   puts "Customer created successfully"
+#   p customers
+# end
 
+# def create_account(customers, accounts)
+#   acc_id = accounts.length + 1
+#   print "Enter customer id: "
+#   cust_id = gets.to_i
+#   # print "Enter Balance: "
+#   # balance = gets.to_f
+#   balance = positive_input("Enter initial bal")
+#   if customers[cust_id]
+#     accounts[acc_id] = {
+#       customer_id: cust_id,
+#       balance: balance
+#     }
+#    puts "Account created successfully"
+#     p accounts
+#   else
+#     puts "Customer not found"
+#   end
+# end
+def validate_phone(customers)
+  loop do 
+    puts "Enter phone no"
+    phone = gets.chomp
+    if phone.length != 10
+      puts "please enter valid 10 digit pone number"
+    elsif customers.values.any? {|c| c[:phone] == phone}
+      puts "phone laredy exists"
+    else
+      return phone 
+    end
+  end  
+end
+
+def create_bank_account(customers, accounts)
   cust_id = customers.length+1
-  puts "Enter customer name"
-  cust_name = gets.chomp
-  phone = 0
-  loop do
-  puts "Enter customer phone: "
-  phone = gets.chomp
-  if phone.length != 10
-    puts "Please enter valid phone number!!!!!"
-  elsif customers.values.any? { |c| c[:phone] == phone }
-    puts "phone already exists"
-    return
-  else
-    break
-  end
-end
-  customers[cust_id] = {name: cust_name, phone: phone}
-  puts "Customer created successfully"
-  p customers
-end
-
-def create_account(customers, accounts)
+  puts "Enter your name: "
+  name = gets.chomp
+  phone = validate_phone(customers)
+  customers[cust_id] = {name: name, phone: phone}
   acc_id = accounts.length + 1
-  print "Enter customer id: "
-  cust_id = gets.to_i
-  # print "Enter Balance: "
-  # balance = gets.to_f
-  balance = positive_input("Enter initial bal")
-  if customers[cust_id]
-    accounts[acc_id] = {
-      customer_id: cust_id,
-      balance: balance
-    }
-   puts "Account created successfully"
-    p accounts
-  else
-    puts "Customer not found"
-  end
+  puts "Enter initial balance:"
+  balance = gets.to_i
+  accounts[acc_id] = {customer_id: cust_id, customer_name: name, balance: balance}
+  puts "\naccount created successfully.."
+  puts "account id: #{acc_id}"
+  puts "customer name linked with acc: #{name}"
+  puts "balance: #{balance}"
+  p accounts
 end
 
 def deposit(accounts, transactions)
-  puts "Enter account id"
-  acc_id = gets.to_i
-
+  # puts "Enter account id"
+  # acc_id = gets.to_i
   # puts "Enter amount to be deposited"
+  acc_id = validate_id("Enter acc id:")
   amount = positive_input("enter amount to be deposited")
-
   if accounts[acc_id]
     accounts[acc_id][:balance] += amount
-
     transactions << {
       type: "deposit",
       account_id: acc_id,
-      amount: amount
+      amount: amount,
+      time: Time.now
     }
     puts "amount added successfully"
     p accounts
@@ -70,9 +98,9 @@ def deposit(accounts, transactions)
 end
 
 def withdraw(accounts, transactions)
-
-  print "Enter Account ID: "
-  acc_id = gets.to_i
+  # print "Enter Account ID: "
+  # acc_id = gets.to_i
+  acc_id = validate_id("Enter acc id:")
   unless accounts[acc_id]
     puts "Account not found"
     return
@@ -86,7 +114,8 @@ def withdraw(accounts, transactions)
   transactions << {
     type: "withdraw",
     account_id: acc_id,
-    amount: amount
+    amount: amount,
+    time: Time.now
   }
   puts "Withdrawal successful"
   p accounts
@@ -94,12 +123,18 @@ def withdraw(accounts, transactions)
 end
 
 def transfer_money(accounts, transactions)
-  print "From Account id: "
-  from = gets.to_i
-  print "To Account id: "
-  to = gets.to_i
-  unless accounts[from] && accounts[to]
-    puts "Invalid account"
+  # print "From Account id: "
+  # from = gets.to_i
+  # print "To Account id: "
+  # to = gets.to_i
+  from = validate_id("from acc id: ")
+  unless accounts[from]
+    puts "invalid account id from which money has to be sent.."
+    return
+  end
+  to = validate_id("to acc id: ")
+  unless accounts[to]
+    puts "invalid account id to which money has to be sent.."
     return
   end
   amount = positive_input("Enter Amount: ")
@@ -113,7 +148,8 @@ def transfer_money(accounts, transactions)
     type: "transfer",
     from: from,
     to: to,
-    amount: amount
+    amount: amount,
+    time: Time.now
   }
   puts "Transfer successful"
   p accounts
@@ -128,7 +164,21 @@ def positive_input(message)
       value = Float(gets.chomp)
       if value <= 0
         # raise "Amount must be positive"
-        puts "Amount must be positive"
+        puts "enter a positive number"
+      else
+        return value
+      end
+    end
+  end
+end
+
+def validate_id(message)
+  loop do
+    print message
+    begin
+      value = Integer(gets.chomp)
+      if value <= 0
+        puts "enter valid id.."
       else
         return value
       end
@@ -142,13 +192,8 @@ end
 
 def take_loan(loans, customers, si_lambda)
   begin
-    print "enter loan id: "
-    loan_id = gets.to_i
-
-    if loans[loan_id]
-      puts "loan already taken"
-      return
-    end
+    # print "enter loan id: "
+    loan_id = loans.length + 1
     print "Enter Customer ID: "
     cust_id = gets.to_i
     unless customers[cust_id]
@@ -172,43 +217,37 @@ def take_loan(loans, customers, si_lambda)
       years: years,
       simple_interest: si
     }
-    puts "loan created successfully"
-    puts "simple Interest = #{si}"
+    puts "loan granted successfully"
+    puts "interest = #{si}"
     p loans
 
   rescue => e
-    puts "e4rror: #{e.message}"
+    puts "error: #{e.message}"
   end
 end
 
-while choice!=8
+while choice!=6
   puts "--Bank Management System-----"
-  puts "1.Add customer"
-  puts "2.Create account"
-  puts "3.Deposit"
-  puts "4.Withdraw"
-  puts "5.Transfer money"
-  puts "6.Take loan"
-  puts "7.Calculate emi"
-  puts "8.Exit"
+  puts "1.Create account"
+  puts "2.Deposit"
+  puts "3.Withdraw"
+  puts "4.Transfer money"
+  puts "5.Take loan"
+  puts "6.Exit"
   puts "Enter your choice"
   choice = gets.to_i
   case choice
   when 1
-     create_customer(customers)
+    create_bank_account(customers, account)
   when 2
-    create_account(customers, account)
-  when 3
     deposit(account, transactions)
-  when 4
+  when 3
     withdraw(account, transactions)
-  when 5
+  when 4
     transfer_money(account, transactions)
-  when 6
+  when 5
     take_loan(loan, customers, si_cal)
-  when 7
-    calculate_emi(emi)
-  when 8
+  when 6
     puts "Exiting"
     break
   else
