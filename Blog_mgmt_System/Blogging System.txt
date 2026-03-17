@@ -1,0 +1,90 @@
+Blogging System ---->
+
+Features:
+--> users(admin, author, reader) registers and log in
+--> admin manages authors, readers, post, reports etc
+--> author creates and manages posts
+--> reader reads, likes post, comments, shares
+
+Entities:
+1.User
+u_id(primary key)
+name
+email
+password
+role
+status (active/ blocked)
+
+2.Post
+p_id(primary key)
+author_id(FK) -- refrences user(u_id)
+title
+content
+status(drafted/published)
+
+3.Comments
+id(PK)
+user_id(FK)--references user(u_id)
+post_id(FK) ---references post(p_id)
+comment_text
+
+4.Categories
+cat_id(PK)
+category_name
+description
+
+5.post_categories(join table)
+post_id(FK)
+category_id(FK)
+
+
+5.Likes
+like_id(PK)
+user_id(FK) 
+post_id(FK)
+
+6.Shares
+share_id(PK)
+user_id(FK)
+post_id(FK)
+platform(fb, instagram, twitter, whatsapp)
+
+7.Views
+view_id(PK)
+post_id(FK)
+user_id(FK)
+view_count (number of times the post vowed by user)
+
+8.Reports
+report_id(PK)
+user_id(FK)
+post_id(FK)
+reason 
+description
+status (pending, resolved, rejectd)
+
+9.Notification
+notification_id(PK)
+user_id(FK)
+post_id(FK)
+message
+type (like/comment/report/share)
+is_read
+
+relationships--->
+1 User -- * Posts
+1 User -- * Comments
+1 User -- like * Posts
+1 User -- share * Posts
+1 User -- report * Posts
+1 User -- receives * Notifications
+* Post -- *Catgeories
+1 Post -- *Comments
+1 Post -- *Likes
+1 Post -- *Shares
+1 Post -- *Views
+1 POst -- * reports
+
+
+
+

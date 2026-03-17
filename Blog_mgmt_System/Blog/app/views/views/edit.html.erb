@@ -1,0 +1,12 @@
+<% content_for :title, "Editing view" %>
+
+<h1>Editing view</h1>
+
+<%= render "form", view: @view %>
+
+<br>
+
+<div>
+  <%= link_to "Show this view", @view %> |
+  <%= link_to "Back to views", views_path %>
+</div>

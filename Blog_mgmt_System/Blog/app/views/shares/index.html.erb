@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Shares" %>
+
+<h1>Shares</h1>
+
+<div id="shares">
+  <% @shares.each do |share| %>
+    <%= render share %>
+    <p>
+      <%= link_to "Show this share", share %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New share", new_share_path %>
