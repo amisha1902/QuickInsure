@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_17_104852) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_18_051914) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,13 +21,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_104852) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "comments", force: :cascade do |t|
+  create_table "comments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.text "content"
     t.datetime "created_at", null: false
+    t.uuid "post_id", null: false
     t.datetime "updated_at", null: false
+    t.uuid "user_id", null: false
+    t.index ["post_id"], name: "index_comments_on_post_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
   create_table "likes", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "like_type"
     t.uuid "post_id", null: false
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
@@ -59,7 +65,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_104852) do
   create_table "posts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
-    t.string "status"
+    t.string "status", default: "drafted"
     t.string "title"
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
@@ -78,6 +84,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_104852) do
     t.index ["user_id"], name: "index_reports_on_user_id"
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "shares", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.uuid "post_id", null: false
@@ -92,9 +104,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_104852) do
     t.string "email"
     t.string "name"
     t.string "password"
-    t.string "role"
-    t.string "status"
+    t.bigint "role_id", null: false
+    t.string "status", default: "inactive"
     t.datetime "updated_at", null: false
+    t.index ["role_id"], name: "index_users_on_role_id"
   end
 
   create_table "views", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -106,6 +119,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_104852) do
     t.index ["user_id"], name: "index_views_on_user_id"
   end
 
+  add_foreign_key "comments", "posts"
+  add_foreign_key "comments", "users"
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
   add_foreign_key "notifications", "posts"
@@ -117,6 +132,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_104852) do
   add_foreign_key "reports", "users"
   add_foreign_key "shares", "posts"
   add_foreign_key "shares", "users"
+  add_foreign_key "users", "roles"
   add_foreign_key "views", "posts"
   add_foreign_key "views", "users"
 end

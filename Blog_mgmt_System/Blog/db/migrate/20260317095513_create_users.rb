@@ -4,8 +4,7 @@ class CreateUsers < ActiveRecord::Migration[8.1]
       t.string :name
       t.string :email
       t.string :password
-      t.string :role
-      t.string :status
+      t.string :status, default: "inactive"
 
       t.timestamps
     end

@@ -26,7 +26,7 @@ class UsersController < ApplicationController
   end
   def destroy
     @user.destroy
-    render json: { message: "User deleted" }
+    render json: { message: "User successfully deleted!!!!!!" }
   end
 
   private
@@ -34,6 +34,6 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
   def user_params
-    params.require(:user).permit(:name, :email, :password, :role, :status)
+    params.require(:user).permit(:name, :email, :password, :role_id, :status)
   end
 end
