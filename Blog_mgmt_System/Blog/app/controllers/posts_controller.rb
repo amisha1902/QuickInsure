@@ -8,14 +8,14 @@ class PostsController < ApplicationController
   post = Post.find(params[:id])
   render json: post
   end
-  def create
+  def create          
     post = Post.new(post_params)
     if post.save
-      render json: post, status: :created
-    else
+      render json: post.as_json.merge( category_names: post.categories.pluck(:category_name)), status: :created    else
       render json: post.errors, status: :unprocessable_entity
     end
   end
+
   def update
     post = Post.find(params[:id])
     if post.update(post_params)
@@ -31,6 +31,7 @@ class PostsController < ApplicationController
   end
   private
   def post_params
-    params.require(:post).permit(:title, :content, :status, :user_id)
+    params.require(:post).permit(:title, :content, :status, :user_id, category_ids: [])
   end
+  
 end

@@ -2,11 +2,18 @@ class CommentsController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :set_comment, only: [:show, :destroy]
   def index
-    render json: Comment.all
+    if params[:post_id]
+      comments = Comment.all.where(post_id: params[:post_id])
+    else
+      comments = Comment.all
+    end
+    render json: comments
   end
+
   def show
     render json: @comment
   end
+
   def create
     comment = Comment.new(comment_params)
 
@@ -16,6 +23,7 @@ class CommentsController < ApplicationController
       render json: comment.errors, status: :unprocessable_entity
     end
   end
+  
   def destroy
     @comment.destroy
     render json: { message: "Comment deleted successfully" }

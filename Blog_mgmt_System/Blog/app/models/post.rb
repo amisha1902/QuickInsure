@@ -1,6 +1,6 @@
 class Post < ApplicationRecord
   belongs_to :user
-
+  
   has_many :post_categories, dependent: :destroy
   has_many :categories, through: :post_categories
   has_many :comments, dependent: :destroy
@@ -12,5 +12,10 @@ class Post < ApplicationRecord
   validates :title, presence: true
   validates :content, presence:true
   validates :status, presence: true
+  validate :category_must_exist
+
+  private
+  def category_must_exist
+    errors.add(:categories, "must exist") if categories.empty?
+  end
 end
- 
