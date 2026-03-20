@@ -10,9 +10,15 @@ class Post < ApplicationRecord
   has_many :reports, dependent: :destroy
 
   validates :title, presence: true
-  validates :content, presence:true
+  validates :content, presence:true 
   validates :status, presence: true
   validate :category_must_exist
+ 
+scope :by_category, ->(category_id) {
+  joins(:categories).where(categories: { id: category_id })
+}
+scope :by_author, ->(user_id) { where(user_id: user_id)}
+  
 
   private
   def category_must_exist

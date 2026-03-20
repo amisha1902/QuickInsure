@@ -5,7 +5,7 @@ class CreateReports < ActiveRecord::Migration[8.1]
       t.references :post, type: :uuid, null: false, foreign_key: true
       t.string :reason
       t.text :description
-      t.string :status
+      t.string :status, default: "pending"
 
       t.timestamps
     end

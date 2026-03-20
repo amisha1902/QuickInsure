@@ -23,7 +23,16 @@ class CommentsController < ApplicationController
       render json: comment.errors, status: :unprocessable_entity
     end
   end
-  
+
+  def update
+    comment = Comment.find(params[:id])
+    if comment.update(comment_params)
+      render json: comment, status: :ok
+    else
+      render json: comment.errors, status: :unprocessable_entity
+    end
+  end
+
   def destroy
     @comment.destroy
     render json: { message: "Comment deleted successfully" }

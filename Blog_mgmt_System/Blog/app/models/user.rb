@@ -12,5 +12,14 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :password, presence: true
   validates :status, inclusion: { in: %w[active inactive blocked] }
+
   scope :active, -> { where(status: 'active') }
+
+  def role_name
+    role&.name
+  end
+
+  def as_json(options = {})
+    super(options.merge(methods: :role_name, except: :role_id))
+  end
 end

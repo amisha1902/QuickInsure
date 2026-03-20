@@ -7,8 +7,21 @@ Rails.application.routes.draw do
   resources :post_categories
   resources :categories
   resources :comments
-  resources :posts
-  resources :users
+  resources :users do
+    member do
+      patch :activate_user
+      put :activate_user
+    end
+  end
+  resources :posts do
+  collection do
+    get 'by_author/:user_id', to: 'posts#by_author'
+    get 'by_category/:category_id', to: 'posts#by_category'
+    get 'analytics/:id', to: 'posts#post_analytics'
+  end
+
+end
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -22,3 +35,4 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 end
+

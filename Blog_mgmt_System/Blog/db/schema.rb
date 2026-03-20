@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_18_051914) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_20_060749) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -33,7 +33,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_051914) do
 
   create_table "likes", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "like_type"
     t.uuid "post_id", null: false
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
@@ -77,7 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_051914) do
     t.text "description"
     t.uuid "post_id", null: false
     t.string "reason"
-    t.string "status"
+    t.string "status", default: "pending"
     t.datetime "updated_at", null: false
     t.uuid "user_id", null: false
     t.index ["post_id"], name: "index_reports_on_post_id"

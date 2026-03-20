@@ -1,70 +1,42 @@
 class LikesController < ApplicationController
-  before_action :set_like, only: %i[ show edit update destroy ]
+  skip_before_action :verify_authenticity_token
+  before_action :set_post
 
-  # GET /likes or /likes.json
   def index
-    @likes = Like.all
+    @likes = @post.likes
+    render json: @likes
   end
 
-  # GET /likes/1 or /likes/1.json
-  def show
-  end
-
-  # GET /likes/new
-  def new
-    @like = Like.new
-  end
-
-  # GET /likes/1/edit
-  def edit
-  end
-
-  # POST /likes or /likes.json
   def create
-    @like = Like.new(like_params)
+    user_id = params[:user_id]
 
-    respond_to do |format|
+    if user_id.blank?
+      render json: { message: "you liked this post" }, status: :bad_request and return
+    end
+
+    @like = @post.likes.find_by(user_id: user_id)
+
+    if @like
+      @like.destroy
+      render json: { message: "you unliked this post" }
+    else
+      @like = @post.likes.new(user_id: user_id)
+
       if @like.save
-        format.html { redirect_to @like, notice: "Like was successfully created." }
-        format.json { render :show, status: :created, location: @like }
+        render json: { message: "post liked by you"}
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @like.errors, status: :unprocessable_entity }
+        render json: @like.errors, status: :unprocessable_entity
       end
-    end
-  end
-
-  # PATCH/PUT /likes/1 or /likes/1.json
-  def update
-    respond_to do |format|
-      if @like.update(like_params)
-        format.html { redirect_to @like, notice: "Like was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @like }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @like.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /likes/1 or /likes/1.json
-  def destroy
-    @like.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to likes_path, notice: "Like was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_like
-      @like = Like.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def like_params
-      params.expect(like: [ :user_id, :post_id ])
+  def set_post
+    @post = Post.find_by(id: params[:post_id])
+
+    unless @post
+      render json: { error: "Post not found" }, status: :not_found and return
     end
+  end
 end
