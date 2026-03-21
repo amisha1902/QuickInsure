@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
     false
   end
 
-  def authorize_admin!
+  def is_admin!
     render json: { error: "Unauthorized. Admin access required." }, status: :unauthorized unless admin_user?
   end
 

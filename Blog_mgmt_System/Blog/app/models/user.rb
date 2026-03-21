@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   belongs_to :role
   has_many :posts, dependent: :destroy
-  has_many :comments, dependent: :destroy
+  # has_many :comments, dependent: :destroy
   has_many :notifications, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :shares, dependent: :destroy

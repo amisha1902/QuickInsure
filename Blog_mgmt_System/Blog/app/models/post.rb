@@ -14,12 +14,9 @@ class Post < ApplicationRecord
   validates :status, presence: true
   validate :category_must_exist
  
-scope :by_category, ->(category_id) {
-  joins(:categories).where(categories: { id: category_id })
-}
+scope :by_category, ->(category_id) {joins(:categories).where(categories: { id: category_id })}
 scope :by_author, ->(user_id) { where(user_id: user_id)}
-  
-
+  scope :published, -> { where(status: "published")}
   private
   def category_must_exist
     errors.add(:categories, "must exist") if categories.empty?

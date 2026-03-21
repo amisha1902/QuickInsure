@@ -9,7 +9,6 @@ Rails.application.routes.draw do
   resources :comments
   resources :users do
     member do
-      patch :activate_user
       put :activate_user
     end
   end
@@ -19,8 +18,20 @@ Rails.application.routes.draw do
     get 'by_category/:category_id', to: 'posts#by_category'
     get 'analytics/:id', to: 'posts#post_analytics'
   end
+  end
+  namespace :admin do
+    resources :posts do
+      collection do
+        get :trending_today
+        get :top_posts
+        get :most_reported
+        get :inactive_users
+        get :category_performance
+      end
+    end
+  end
 
-end
+
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

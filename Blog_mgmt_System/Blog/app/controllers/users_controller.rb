@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   skip_before_action :verify_authenticity_token
-  before_action :set_user, only: %i[show update destroy update_status]
-  before_action :authorize_admin!, only: [:update_status]
+  before_action :set_user, only: %i[show update destroy activate_user]
+  before_action :authorize_admin!, only: [:activate_user]
   
   def index
     users = User.all
@@ -33,7 +33,7 @@ class UsersController < ApplicationController
     render json: { message: "User successfully deleted!!!!!!" }
   end
 
-  def update_status
+  def activate_user
     if !%w[active inactive blocked].include?(params[:status])
       render json: { error: "Invalid status. Must be one of: active, inactive, blocked" }, status: :unprocessable_entity
       return
